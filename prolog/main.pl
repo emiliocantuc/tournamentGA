@@ -12,12 +12,12 @@ library(pairs).
 :- [inicialization,fitness,utils].
 
 % Parameters 
-n(200). % Size of population
-nTeams(4). % Number of teams in tournament
+n(100). % Size of population
+nTeams(10). % Number of teams in tournament
 propElite(0.05).
 mutationRate(0.2).
 coldness(0.8).
-maxGens(20).
+maxGens(2000).
 
 % Derived parameters
 nElite(Res):-
@@ -60,6 +60,7 @@ evolve(M,M):-!.
 evolve(Gen,M):-
     elite(E),
     tournamentSelection,
+    crossoverPopulation,
     mutatePopulation,
     % Append elite to population
     population(Pop),
@@ -78,7 +79,6 @@ elite(Res):-
     sortByFitness(Pop,Sorted),
     firstN(Sorted,N,Res),
     !.
-
 
 % Tournament Selection
 toAdd(Better,_,R,ToAdd):-
@@ -128,6 +128,21 @@ mutatePopulation([I|Rest],Temp,New):-
 
 % Operators
 
+crossoverPopulation:-
+    nNonElite(N),
+    crossoverPopulation(0,N,[],New),
+    setPopulation(New),
+    !.
+crossoverPopulation(N,N,Temp,Temp):-!.
+crossoverPopulation(I,N,Temp,New):-
+    population(Pop),
+    random_member(A,Pop),
+    random_member(B,Pop),
+    crossover(A,B,Off1,Off2),
+    append([Off1,Off2],Temp,Temp2),
+    I2 is (I+1),
+    crossoverPopulation(I2,N,Temp2,New),
+    !.
 % Linear 1 point crossover
 % crossover(i,i,i,o,o):
 crossover(A,B,Off1,Off2):-
