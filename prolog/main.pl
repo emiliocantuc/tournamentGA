@@ -1,38 +1,31 @@
 
 library(lists).
 library(apply).
+library(random).
+
+:- dynamic population /1. % The current population
 
 
-n(8).
+% Consultamos los demas archivos.
+:- [inicialization,fitness,utils].
 
-% games(i,o). Genera una lista de partidos dado n equipos
-sig(A,N,N,SigA,SigB):-
-    SigA is (A+1),
-    SigB is 1,
-    !.
-sig(A,B,_,A,SigB):-
-    SigB is (B+1),
-    !.
-games(N):-
-    games(1,1,N,Temp),
-    write(Temp),
-    !.
-games(N,Res):-
-    games(1,1,N,Res),
-    !.
-games(N,B,N,[[N,B]]):-
-    B=:=(N-1),
-    !.
-games(A,A,N,Res):-
-    sig(A,A,N,A2,B2),
-    games(A2,B2,N,Res),
-    !.
-games(A,B,N,Res):-
-    sig(A,B,N,A2,B2),
-    games(A2,B2,N,Temp),
-    append(Temp,[[A,B]],Res),
-    !.
+% Parametros 
+n(500).
+nTeams(8).
+mutationRate(0.2).
+temperature(0.8).
 
 
-
+%crossover(i,i,i,o,o):
+%El índice se cuenta desde 1
+crossover(L1, L2, Indice, H1, H2):-
+    IM1 is Indice-1,
+    length(L1, Length1),
+    slice(L1, 0, Indice, L1P1),
+    slice(L2, 0, Indice, L2P1),
+    Length is Length1+1,
+    slice(L1, IM1, Length, L1P2),
+    slice(L2, IM1, Length, L2P2),
+    append(L1P1, L2P2, H1),
+    append(L2P1, L1P2, H2).
 
