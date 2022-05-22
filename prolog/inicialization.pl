@@ -1,6 +1,19 @@
-populate():-
+populate:-
     n(N),
-    
+    populate(0,N,[],Pop),
+    write(Pop),
+    setPopulation(Pop),
+    !.
+populate(N,N,Pop,Pop):-!.
+populate(I,N,Temp,Pop):-
+    I=<N,
+    nTeams(Nteams),
+    approx(Nteams,New),
+    append([New],Temp,Pop2),
+    I2 is I+1,
+    populate(I2,N,Pop2,Pop),
+    !.
+
 
 
 % games(i,o). Genera una lista de partidos dado n equipos

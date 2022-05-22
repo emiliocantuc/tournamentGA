@@ -1,3 +1,9 @@
+fitness(Individual,F):-
+    nTeams(N),
+    nConflicts(Individual,N,Conf),
+    F is Conf*(-1),
+    !.
+
 
 nConflicts(Assignment,N,Out):-
     nConflicts(Assignment,0,N,0,Out),
