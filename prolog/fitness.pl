@@ -4,6 +4,11 @@ fitness(Individual,F):-
     F is Conf*(-1),
     !.
 
+negFitness(Individual,F):- %For sorting
+    fitness(Individual,Temp),
+    F is Temp*(-1),
+    !.
+
 
 betterAndWorse(A,B,Better,Worse):-
     fitness(A,Fa),
@@ -13,6 +18,13 @@ betterAndWorse(A,B,Better,Worse):-
     Worse is B,
     !.
 betterAndWorse(A,B,B,A):-!.
+
+sortByFitness(L,Sorted):-
+    population(L),
+    map_list_to_pairs(negFitness,L,Pairs),
+    keysort(Pairs,Temp),
+    pairs_values(Temp, Sorted),
+    !.
 
 nConflicts(Assignment,N,Out):-
     nConflicts(Assignment,0,N,0,Out),

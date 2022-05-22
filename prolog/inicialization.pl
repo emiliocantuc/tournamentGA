@@ -1,7 +1,6 @@
 populate:-
     n(N),
     populate(0,N,[],Pop),
-    write(Pop),
     setPopulation(Pop),
     !.
 populate(N,N,Pop,Pop):-!.
