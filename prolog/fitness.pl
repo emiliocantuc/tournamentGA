@@ -5,6 +5,15 @@ fitness(Individual,F):-
     !.
 
 
+betterAndWorse(A,B,Better,Worse):-
+    fitness(A,Fa),
+    fitness(A,Fb),
+    Fa>Fb,
+    Better is A,
+    Worse is B,
+    !.
+betterAndWorse(A,B,B,A):-!.
+
 nConflicts(Assignment,N,Out):-
     nConflicts(Assignment,0,N,0,Out),
     !.

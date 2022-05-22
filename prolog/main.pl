@@ -4,15 +4,27 @@ library(apply).
 library(random).
 
 :- dynamic population /1. % The current population
-:- dynamic listOfGames /1. % The current population
+:- dynamic listOfGames /1. % The list of games to play
 
 
-% Consultamos los demas archivos.
+% Consult other files.
 :- [inicialization,fitness,utils].
 
-% Parametros 
-n(3).
+% Parameters 
+n(300). 
 nTeams(4).
+propElite(0.1).
+nElite(Res):-
+    n(N),
+    propElite(Prop),
+    P is N*Prop,
+    Res is floor(P),
+    !.
+nNonElite(Res):-
+    nElite(E),
+    n(N),
+    Res is (N-E),
+    !.
 mutationRate(0.2).
 temperature(0.8).
 maxGens(100).
@@ -30,6 +42,28 @@ evolve:-
     !.
 evolve(M,M):-!.
 evolve(I,M):-!.
+
+
+
+mutatePopulation:-
+    population(Pop),
+    mutatePopulation(Pop,[],New),
+    setPopulation(New),
+    !.
+mutatePopulation([],Temp,Temp):-!.
+mutatePopulation([I|Rest],Temp,New):-
+    random(0.0,1.0,R),
+    mutationRate(Mr),
+    R<Mr,
+    mutate(I,Mutated),
+    append(Temp,[Mutated],Temp2),
+    mutatePopulation(Rest,Temp2,New),
+    !.
+mutatePopulation([I|Rest],Temp,New):-
+    append(Temp,[I],Temp2),
+    mutatePopulation(Rest,Temp2,New),
+    !.
+
 
 % Linear 1 point crossover
 % crossover(i,i,i,o,o):
@@ -54,7 +88,6 @@ crossover(L1, L2, Index, H1, H2):-
 mutate(Individual,Mutated):-
     listOfGames(Gs),
     random_member(Game,Gs),
-    write(Game),
     length(Individual,U),
     random(0,U,Index),
     replace(Individual,Index,Game,Mutated),
