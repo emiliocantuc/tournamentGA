@@ -28,6 +28,10 @@ setGames(L):-
     asserta(listOfGames(L):-!),
     !.
 
+% Write Parameters
+parameters:-
+    !.
+
 % Logging
 writeStatistics(Gen):-
     write("Gen: "),write(Gen),

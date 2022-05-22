@@ -12,9 +12,14 @@ library(pairs).
 :- [inicialization,fitness,utils].
 
 % Parameters 
-n(10). % Size of population
-nTeams(4). % Number of teams in tournament
-propElite(0.1).
+n(200). % Size of population
+nTeams(8). % Number of teams in tournament
+propElite(0.05).
+mutationRate(0.2).
+temperature(0.8).
+maxGens(500).
+
+% Derived parameters
 nElite(Res):-
     n(N),
     propElite(Prop),
@@ -26,9 +31,6 @@ nNonElite(Res):-
     n(N),
     Res is (N-E),
     !.
-mutationRate(0.2).
-temperature(0.8).
-maxGens(100).
 
 
 evolve:-
