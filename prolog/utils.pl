@@ -30,6 +30,18 @@ setGames(L):-
 
 % Write Parameters
 parameters:-
+    write("\nShowing parameters"),nl,nl,
+    n(N),
+    write("Population size: "),write(N),nl,
+    nTeams(Nteams),
+    write("Number of teams: "),write(Nteams),nl,
+    mutationRate(Mr),
+    write("Mutation rate: "),write(Mr),nl,
+    propElite(P),
+    nElite(E),
+    write("Elite proportion: "),write(P),write(" ("),write(E),write(")"),nl,
+    coldness(C),
+    write("Coldness: "),write(C),nl,nl,
     !.
 
 % Logging
@@ -43,8 +55,7 @@ writeStatistics(Gen):-
     write(" Min: "),write(Min),
     write(" Max: "),write(Max),
     write(" Mean: "),write(Mean),
-    nl,
-    
+    nl,  
     !.
 
 fitnesses(Pop,Out):-
@@ -62,3 +73,19 @@ average(List,Average):-
     length(List,Length),
     Length>0, 
     Average is Sum/Length.
+
+
+
+outputToFile(Filename):-
+    setOfValid(List),
+    open(Filename, write, File),
+    writeList(File, List),
+    close(File).
+
+writeList(_File, []) :- !.
+writeList(File, [Head|Tail]) :-
+    write(File, Head),
+    fitness(Head,F),
+    write(File,","),write(File,F),
+    write(File, '\n'),
+    writeList(File, Tail).

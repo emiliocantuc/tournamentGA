@@ -4,6 +4,7 @@ fitness(Individual,F):-
     F is Conf*(-1),
     !.
 
+
 negFitness(Individual,F):- %For sorting
     fitness(Individual,Temp),
     F is Temp*(-1),
@@ -24,6 +25,18 @@ sortByFitness(L,Sorted):-
     map_list_to_pairs(negFitness,L,Pairs),
     keysort(Pairs,Temp),
     pairs_values(Temp, Sorted),
+    !.
+
+valid(Assignment):-
+    nTeams(N),
+    nConflicts(Assignment,N,Out),
+    Out=:=0,
+    !.
+
+setOfValid(Res):-
+    population(Pop),
+    include(valid,Pop,List),
+    list_to_set(List,Res),
     !.
 
 nConflicts(Assignment,N,Out):-

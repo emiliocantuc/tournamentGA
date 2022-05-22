@@ -13,11 +13,11 @@ library(pairs).
 
 % Parameters 
 n(200). % Size of population
-nTeams(8). % Number of teams in tournament
+nTeams(4). % Number of teams in tournament
 propElite(0.05).
 mutationRate(0.2).
-temperature(0.8).
-maxGens(500).
+coldness(0.8).
+maxGens(20).
 
 % Derived parameters
 nElite(Res):-
@@ -34,16 +34,25 @@ nNonElite(Res):-
 
 
 evolve:-
+    % Write parameters
+    parameters,
     % Set list of games to mutate faster
     nTeams(Nteams),
     games(Nteams,G),
     setGames(G),
     % Initialize population
     populate,
-    write("Initialized population with approx solutions"),nl,
+    write("Initialized population with approx solutions"),nl,nl,
     % Evolve
     maxGens(M),
     evolve(0,M),
+
+    setOfValid(Out),
+    length(Out,L),
+    nl,write("Found "),write(L),write(" unique valid solution(s)."),nl,
+    write("Writing them to output.txt"),nl,
+
+    outputToFile("output.txt"),
     !.
 
 
@@ -73,7 +82,7 @@ elite(Res):-
 
 % Tournament Selection
 toAdd(Better,_,R,ToAdd):-
-    temperature(T),
+    coldness(T),
     R<T,
     ToAdd=Better,
     !.
