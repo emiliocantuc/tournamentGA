@@ -1,8 +1,10 @@
+% Fills population with n approx individuals.
 populate:-
     n(N),
     populate(0,N,[],Pop),
     setPopulation(Pop),
     !.
+%populate(i,i,i,o).
 populate(N,N,Pop,Pop):-!.
 populate(I,N,Temp,Pop):-
     I=<N,
@@ -13,20 +15,14 @@ populate(I,N,Temp,Pop):-
     populate(I2,N,Pop2,Pop),
     !.
 
-
-
-% games(i,o). Genera una lista de partidos dado n equipos
-sig(A,N,N,SigA,SigB):-
-    SigA is (A+1),
-    SigB is 1,
-    !.
-sig(A,B,_,A,SigB):-
-    SigB is (B+1),
-    !.
+% Generates the list of games to be played as a function of n.
+% Writes generated games (for debugging).
+% games(i).
 games(N):-
     games(1,1,N,Temp),
     write(Temp),
     !.
+% games(i,o).
 games(N,Res):-
     games(1,1,N,Res),
     !.
@@ -42,39 +38,37 @@ games(A,B,N,Res):-
     games(A2,B2,N,Temp),
     append(Temp,[[A,B]],Res),
     !.
+% Used in games. Determines next values for A and B.
+sig(A,N,N,SigA,SigB):-
+    SigA is (A+1),
+    SigB is 1,
+    !.
+sig(A,B,_,A,SigB):-
+    SigB is (B+1),
+    !.
 
-% Random games
+% A random permutation of games(N).
+% randomAssignment(i,o).
 randomAssignment(N,Res):-
     games(N,Temp),
     random_permutation(Temp,Res),
     !.
 
-% Available
-available(Remaining,Week,Res):-
-    subtract(Remaining,Week,Res),
-    !.
-
-% Game to Add
-gameToAdd(Remaining,Week,Game):-
-    available(Remaining,Week,Available),
-    length(Available,La),
-    La>0,
-    random_member(Game,Available),
-    !.
-gameToAdd(Remaining,_,Game):-
-    random_member(Game,Remaining),
-    !.
+% Generates a random approximate assignment greedily. Used at inicialization.
+% Tries to add games not in week while possible. It otherwise adds
+% a random game from games.
+% approx(i,o).
 approx(N,Out):-
     randomAssignment(N,Remaining),
     K is N/2,
     approx(Remaining,[],K,[],Out),
     !.
+% approx(i,i,i,i,o).
 approx(Remaining,_,_,Res,Out):-
     length(Remaining,Lr),
     Lr=:=0,
     Out=Res,
     !.
-
 approx(Remaining,Week,K,Res,Out):-
     length(Remaining,Lr),
     Lr>0,
@@ -90,3 +84,25 @@ approx(Remaining,Week,K,Res,Out):-
     % Recursive call
     approx(Remaining2,Week3,K,Res2,Out),
     !.
+
+
+% Used in approx. Determines which game to add next to assignment.
+% If there are "available" games, choose one at random.
+% Otherwise choose a random game from games.
+% gameToAdd(i,i,o).
+gameToAdd(Remaining,Week,Game):-
+    available(Remaining,Week,Available),
+    length(Available,La),
+    La>0,
+    random_member(Game,Available),
+    !.
+gameToAdd(Remaining,_,Game):-
+    random_member(Game,Remaining),
+    !.
+    
+% Used in approx. Games in Remaining not in week.
+% available(i,i,o).
+available(Remaining,Week,Res):-
+    subtract(Remaining,Week,Res),
+    !.
+
