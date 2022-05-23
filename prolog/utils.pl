@@ -45,16 +45,15 @@ parameters:-
     !.
 
 % Logging
-writeStatistics(Gen):-
+writeStatistics(Gen,Fs,TimeSince):-
     write("Gen: "),write(Gen),
-    population(Pop),
-    fitnesses(Pop,Fs),
     min_list(Fs,Min),
     max_list(Fs,Max),
     average(Fs,Mean),
     write(" Min: "),write(Min),
+    write(" Mean: "),format("~2f", [Mean]),
     write(" Max: "),write(Max),
-    write(" Mean: "),write(Mean),
+    write(" Time Since Improvement: "),write(TimeSince),
     nl,  
     !.
 

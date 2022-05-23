@@ -18,6 +18,7 @@ propElite(0.05).
 mutationRate(0.2).
 coldness(0.8).
 maxGens(2000).
+maxWithoutImprovement(250).
 
 % Derived parameters
 nElite(Res):-
@@ -44,8 +45,8 @@ evolve:-
     populate,
     write("Initialized population with approx solutions"),nl,nl,
     % Evolve
-    maxGens(M),
-    evolve(0,M),
+    maxWithoutImprovement(M),
+    evolve(1,0,-100,M),
 
     setOfValid(Out),
     length(Out,L),
@@ -56,21 +57,44 @@ evolve:-
     !.
 
 
-evolve(M,M):-!.
-evolve(Gen,M):-
-    elite(E),
+newTimeSinceImprovement(_,LastMax,Max,NewTime,NewMax):-
+    Max>LastMax,
+    NewTime is 0,
+    NewMax is Max,
+    !.
+newTimeSinceImprovement(LastTime,LastMax,_,NewTime,NewMax):-
+    NewTime is (LastTime+1),
+    NewMax is LastMax,
+    !.
+
+evolve(_,M,_,M):-!.
+evolve(Gen,TimeSince,LastMax,M):-
+    % Set aside elite
+    elite(Elite),
+
+    % Apply selection, crossover and mutation
     tournamentSelection,
     crossoverPopulation,
     mutatePopulation,
+
     % Append elite to population
     population(Pop),
-    append(E,Pop,New),
+    append(Elite,Pop,New),
     setPopulation(New),
 
-    writeStatistics(Gen),
+    % Calculate fitness of individuals
+    fitnesses(New,Fs),
 
-    I2 is (Gen+1),
-    evolve(I2,M),
+    % Determine Time SInce Improvement
+    max_list(Fs,CurrentMax),
+    newTimeSinceImprovement(TimeSince,LastMax,CurrentMax,TimeSince2,Max2),
+
+    % Write relevant generation statistics
+    writeStatistics(Gen,Fs,TimeSince2),
+
+    % Repeat
+    Gen2 is (Gen+1),
+    evolve(Gen2,TimeSince2,Max2,M),
     !.
 
 elite(Res):-
@@ -130,10 +154,13 @@ mutatePopulation([I|Rest],Temp,New):-
 
 crossoverPopulation:-
     nNonElite(N),
-    crossoverPopulation(0,N,[],New),
+    Half is N/2,
+    crossoverPopulation(0,Half,[],New),
     setPopulation(New),
     !.
-crossoverPopulation(N,N,Temp,Temp):-!.
+crossoverPopulation(I,N,Temp,Temp):-
+    I>=N,
+    !.
 crossoverPopulation(I,N,Temp,New):-
     population(Pop),
     random_member(A,Pop),
