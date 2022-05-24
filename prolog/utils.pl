@@ -113,6 +113,13 @@ setGames(L):-
     asserta(listOfGames(L):-!),
     !.
 
+% Sets coldness as C in dynamic database.
+% setColdnesss(i).
+setColdnesss(C):-
+    retractall(coldness),
+    asserta(coldness(C):-!),
+    !.
+
 % Writes Parameters
 parameters:-
     write("\nShowing parameters"),nl,nl,
@@ -137,12 +144,14 @@ writeStatistics(Gen,Fs,TimeSince):-
     max_list(Fs,Max),
     average(Fs,Mean),
     setOfValid(Valid),
+    coldness(C),
     length(Valid,V),
-    write(" Min: "),format("~4f", [Min]),
-    write(" Mean: "),format("~4f", [Mean]),
-    write(" Max: "),format("~4f", [Max]),
-    write(" # valid: "),write(V),
-    write(" Time Since Improvement: "),write(TimeSince),
+    write("   C: "),format("~2f", [C]),
+    write("   Min: "),format("~4f", [Min]),
+    write("   Mean: "),format("~4f", [Mean]),
+    write("   Max: "),format("~4f", [Max]),
+    write("   # valid: "),write(V),
+    write("   Time Since Improvement: "),write(TimeSince),
     nl,  
     !.
 

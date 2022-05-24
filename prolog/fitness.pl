@@ -4,8 +4,10 @@ fitness(Individual,F):-
     nTeams(N),
     nConflicts(Individual,N,Conf),
     length(Individual,MaxConf),
-    alterningScore(Individual,N,Alt),
-
+    onlyValidScore(OnlyValid),
+    (
+        OnlyValid-> Alt is 1; alterningScore(Individual,N,Alt)
+    ),
     Temp is (0.95*(1-(Conf/MaxConf)))+(Alt*0.05),
     (
         Conf=:=0 -> Bonus is 1.0;

@@ -7,19 +7,23 @@ library(pairs).
 % Dynamic predicates
 :- dynamic population /1. % The current population
 :- dynamic listOfGames /1. % The list of games to play
-
+:- dynamic coldness/1. % Current selection pressure
 
 % Consult other files.
 :- [inicialization,fitness,utils].
 
 % Parameters 
 n(100). % Size of population
-nTeams(8). % Number of teams in tournament
+nTeams(16). % Number of teams in tournament
 propElite(0.05). % Best % of population considered elite
 mutationRate(0.2). % Rate at which to randomly apply mutation
-coldness(0.8). % Selection pressure parameter used in tournament selection
+coldness(0.5). % Selection pressure parameter used in tournament selection
+coldnessInc(0.005). % Amount with which to increment coldness each generation.
+maxColdness(0.85). % The max value coldness can take.
 % Used in stopping criteria. Max number of iterations allowable without improvement.
 maxWithoutImprovement(100). 
+onlyValidScore(true).
+
 
 % Derived parameters
 % Number of individuals of elite as a function of n and propElite.
@@ -99,11 +103,22 @@ evolve(Gen,TimeSince,LastMax,M):-
     % Write relevant generation statistics
     writeStatistics(Gen,Fs,TimeSince2),
 
+    % Update selection pressure
+    updateColdness,
+
     % Repeat
     Gen2 is (Gen+1),
     evolve(Gen2,TimeSince2,Max2,M),
     !.
 
+updateColdness:-
+    coldness(Old),
+    coldnessInc(Inc),
+    maxColdness(M),
+    New is (Old+Inc),
+    Actual is min(New,M),
+    setColdnesss(Actual),
+    !.
 
 % Determines Time Since Improvement and population's Max from
 % previous values of each.
