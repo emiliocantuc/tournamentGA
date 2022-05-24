@@ -5,10 +5,37 @@ fitness(Individual,F):-
     nConflicts(Individual,N,Conf),
     length(Individual,MaxConf),
     alterningScore(Individual,N,Alt),
-    F is (0.9*(1-(Conf/MaxConf)))+(Alt*0.1),
+
+    Temp is (0.95*(1-(Conf/MaxConf)))+(Alt*0.05),
+    (
+        Conf=:=0 -> Bonus is 1.0;
+        Bonus is 0.0
+    ),
+    F is Temp+Bonus,
     !.
 
-
+nConflicts(Assignment,N,Out):-
+    nConflicts(Assignment,0,N,0,WeekConf),
+    list_to_set(Assignment,Set),
+    length(Set,S),
+    A is (N*(N-1)),
+    Out is WeekConf+((A-S)/A),
+    !.
+nConflicts(_,I,N,Count,Out):-
+    I>=(N*(N-1)),
+    Out=Count,
+    !.
+nConflicts(Assignment,I,N,Count,Out):-
+    End is I+(N/2)+1,
+    slice(Assignment,I,End,Slice),
+    flatten(Slice,F),
+    list_to_set(F,Set),
+    length(Set,S2),
+    Count2 is Count+(N-S2)/(N/2),
+    I2 is (End-1),
+    nConflicts(Assignment,I2,N,Count2,Out),
+    !.
+/* 
 % The number of conflicts in an assignment.
 % nConflicts(i,i,o).
 nConflicts(Assignment,N,Out):-
@@ -49,7 +76,7 @@ addToCount(_,Bc,_):-
 addToCount(_,_,Gc):-
     Gc>1,
     !.
-
+ */
 % Rewards an assignment for having teams alternate between
 % home and visiting games.
 % alterningScore(i,i,o).
@@ -72,7 +99,10 @@ alterningScore(Assignment,Team,N,Sum):-
     length(Rest,L),
     Ngames is (L-1),
     alterning(Rest,Team,Home,Alt),
-    Sum is Temp+((Alt-1)/Ngames),
+    (
+        Ngames=:=0 -> Sum is Temp;
+        Sum is Temp+((Alt-1)/Ngames)
+    ),
     !.
 
 teamInGame(A,[A|[_]]):-!.
