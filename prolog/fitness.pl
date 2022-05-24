@@ -1,44 +1,12 @@
 fitness(Individual,F):-
     nTeams(N),
     nConflicts(Individual,N,Conf),
-    F is Conf*(-1),
-    !.
-
-negFitness(Individual,F):- %For sorting
-    fitness(Individual,Temp),
-    F is Temp*(-1),
+    length(Individual,MaxConf),
+    F is (1-(Conf/MaxConf)),
     !.
 
 
-betterAndWorse(A,B,Better,Worse):-
-    fitness(A,Fa),
-    fitness(A,Fb),
-    Fa>Fb,
-    Better is A,
-    Worse is B,
-    !.
-betterAndWorse(A,B,B,A):-!.
-
-sortByFitness(L,Sorted):-
-    population(L),
-    map_list_to_pairs(negFitness,L,Pairs),
-    keysort(Pairs,Temp),
-    pairs_values(Temp, Sorted),
-    !.
-
-valid(Assignment):-
-    nTeams(N),
-    nConflicts(Assignment,N,Out),
-    Out=:=0,
-    !.
-
-setOfValid(Res):-
-    population(Pop),
-    include(valid,Pop,List),
-    list_to_set(List,Res),
-    !.
-
-
+% The number of conflicts in an assignment.
 nConflicts(Assignment,N,Out):-
     weekLevelConflicts(Assignment,N,Out),
     !.
