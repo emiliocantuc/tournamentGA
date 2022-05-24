@@ -4,7 +4,6 @@ fitness(Individual,F):-
     F is Conf*(-1),
     !.
 
-
 negFitness(Individual,F):- %For sorting
     fitness(Individual,Temp),
     F is Temp*(-1),
@@ -39,23 +38,46 @@ setOfValid(Res):-
     list_to_set(List,Res),
     !.
 
+
 nConflicts(Assignment,N,Out):-
-    nConflicts(Assignment,0,N,0,Out),
+    weekLevelConflicts(Assignment,N,Out),
     !.
-nConflicts(_,I,N,Count,Out):-
+weekLevelConflicts(Assignment,N,Out):-
+    weekLevelConflicts(Assignment,0,N,0,Out),
+    !.
+weekLevelConflicts(_,I,N,Count,Out):-
     I>=(N*(N-1)),
     Out=Count,
     !.
-nConflicts(Assignment,I,N,Count,Out):-
+weekLevelConflicts(Assignment,I,N,Count,Out):-
     End is I+(N/2)+1,
-    slice(Assignment,I,End,Slice),
-    flatten(Slice,F),
-    list_to_set(F,Set),
-    length(F,S1),
-    length(Set,S2),
-    Count2 is Count+(S1-S2),
+    slice(Assignment,I,End,GamesInWeek),
+    flatten(GamesInWeek,TeamsInWeek),
+    conflictsInWeek(Assignment,TeamsInWeek,GamesInWeek,0,C),
+    Count2 is (Count+C),
     I2 is (End-1),
-    nConflicts(Assignment,I2,N,Count2,Out),
+    weekLevelConflicts(Assignment,I2,N,Count2,Out),
     !.
+
+conflictsInWeek(_,_,[],Count,Count):-!.
+conflictsInWeek(Assignment,TeamsInWeek,[[A|[B]]|Rest],Count,Res):-
+    conflictsInWeek(Assignment,TeamsInWeek,Rest,Count,Temp),
+    
+    count(TeamsInWeek,A,Ac),
+    count(TeamsInWeek,B,Bc),
+    count(Assignment,[A,B],Gc),
+    (addToCount(Ac,Bc,Gc) -> Res is (Temp+1); Res is Temp),
+    !.
+addToCount(Ac,_,_):-
+    Ac>1,
+    !.
+addToCount(_,Bc,_):-
+    Bc>1,
+    !.
+addToCount(_,_,Gc):-
+    Gc>1,
+    !.
+
+
 
 

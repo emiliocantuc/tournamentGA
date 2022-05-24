@@ -1,6 +1,18 @@
 take(Src,N,L) :- findall(E, (nth1(I,Src,E), I =< N), L).
 
+count([] , _,0). %empty list, count of anything is 0. Base case.
 
+% The first item in the list is the same as what you want to count so
+% add1 to the recursive count.
+count([H|T] , H,NewCount):-
+ count(T,H,OldCount),
+ NewCount is OldCount +1,
+ !.
+%The first item in the list is different so keep old count
+count([H|T] , H2,Count):-
+ dif(H,H2),
+ count(T,H2,Count),
+ !.
 
 slice(L, From, To, R):-
   length(LFrom, From),
@@ -11,6 +23,14 @@ slice(L, From, To, R):-
 firstN(L,N,Res):-
     End is (N+1),
     slice(L,0,End,Res),
+    !.
+
+lastN(L,N,Res):-
+    length(L,End),
+    ActualEnd is (End+1),
+    S is (End-N),
+    ActualStart is max(S,0),
+    slice(L,ActualStart,ActualEnd,Res),
     !.
 
 

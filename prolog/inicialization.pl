@@ -59,7 +59,7 @@ randomAssignment(N,Res):-
 % a random game from games.
 % approx(i,o).
 approx(N,Out):-
-    randomAssignment(N,Remaining),
+    games(N,Remaining),
     K is N/2,
     approx(Remaining,[],K,[],Out),
     !.
@@ -70,6 +70,11 @@ approx(Remaining,_,_,Res,Out):-
     Out=Res,
     !.
 approx(Remaining,Week,K,Res,Out):-
+    length(Week,L),
+    L=:=K,
+    approx(Remaining,[],K,Res,Out),
+    !.
+approx(Remaining,Week,K,Res,Out):-
     length(Remaining,Lr),
     Lr>0,
     gameToAdd(Remaining,Week,Game),
@@ -77,12 +82,10 @@ approx(Remaining,Week,K,Res,Out):-
     append(Res,[Game],Res2),
     % Add to Week
     append([Game],Week,Week2),
-    % Adjust week
-    take(Week2,K,Week3),
     % Remove from remaining
     subtract(Remaining,[Game],Remaining2),
     % Recursive call
-    approx(Remaining2,Week3,K,Res2,Out),
+    approx(Remaining2,Week2,K,Res2,Out),
     !.
 
 
@@ -102,7 +105,14 @@ gameToAdd(Remaining,_,Game):-
     
 % Used in approx. Games in Remaining not in week.
 % available(i,i,o).
+gameTeamsInWeek(TeamsInWeek,[A|[B]]):-
+    count(TeamsInWeek,A,Ac),
+    Ac=:=0,
+    count(TeamsInWeek,B,Bc),
+    Bc=:=0,
+    !.
 available(Remaining,Week,Res):-
-    subtract(Remaining,Week,Res),
+    flatten(Week,TeamsInWeek),
+    include(gameTeamsInWeek(TeamsInWeek),Remaining,Res),
     !.
 

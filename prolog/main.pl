@@ -14,7 +14,7 @@ library(pairs).
 
 % Parameters 
 n(100). % Size of population
-nTeams(4). % Number of teams in tournament
+nTeams(8). % Number of teams in tournament
 propElite(0.05). % Best % of population considered elite
 mutationRate(0.2). % Rate at which to randomly apply mutation
 coldness(0.8). % Selection pressure parameter used in tournament selection
