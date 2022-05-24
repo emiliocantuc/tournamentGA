@@ -1,12 +1,16 @@
+% Determines the fitness of an individual.
+% fitness(i,o).
 fitness(Individual,F):-
     nTeams(N),
     nConflicts(Individual,N,Conf),
     length(Individual,MaxConf),
-    F is (1-(Conf/MaxConf)),
+    alterningScore(Individual,N,Alt),
+    F is (0.9*(1-(Conf/MaxConf)))+(Alt*0.1),
     !.
 
 
 % The number of conflicts in an assignment.
+% nConflicts(i,i,o).
 nConflicts(Assignment,N,Out):-
     weekLevelConflicts(Assignment,N,Out),
     !.
@@ -46,6 +50,49 @@ addToCount(_,_,Gc):-
     Gc>1,
     !.
 
+% Rewards an assignment for having teams alternate between
+% home and visiting games.
+% alterningScore(i,i,o).
+alterningScore(Assignment,N,Out):-
+    alterningScore(Assignment,1,N,Sum),
+    Out is Sum/N,
+    !.
 
+alterningScore(_,Team,N,Sum):-
+    Team>N,
+    Sum is 0,
+    !.
+alterningScore(Assignment,Team,N,Sum):-
+    Team2 is (Team+1),
+    alterningScore(Assignment,Team2,N,Temp),
+    teamGames(Assignment,Team,[[A|[_]]|Rest]),
+    (
+        A=:=Team -> Home is 1; Home is 0
+    ),
+    length(Rest,L),
+    Ngames is (L-1),
+    alterning(Rest,Team,Home,Alt),
+    Sum is Temp+((Alt-1)/Ngames),
+    !.
 
+teamInGame(A,[A|[_]]):-!.
+teamInGame(B,[_|[B]]):-!.
+teamGames(Assignment,Team,Res):-
+    include(teamInGame(Team),Assignment,Res),
+    !.
 
+alterning([],_,_,0):-!.
+alterning([[_|[B]]|Rest],B,1,Alt):-
+    alterning(Rest,B,0,Temp),
+    Alt is Temp+1,
+    !.
+alterning([[A|[_]]|Rest],A,0,Alt):-
+    alterning(Rest,A,1,Temp),
+    Alt is Temp+1,
+    !.
+alterning([[A|[_]]|Rest],A,1,Alt):-
+    alterning(Rest,A,1,Alt),
+    !.
+alterning([[_|[B]]|Rest],B,0,Alt):-
+    alterning(Rest,B,0,Alt),
+    !.

@@ -55,9 +55,6 @@ setOfValid(Res):-
     list_to_set(List,Res),
     !.
 
-
-
-
 % Count the number of occurances in a list.
 % count(i,i,o).
 count([],_,0).
